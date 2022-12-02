@@ -1,32 +1,50 @@
 package dad.login;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-
-import org.apache.commons.codec.digest.DigestUtils;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 public class Model {
 
-	public boolean checkLogin(String user, String password) throws Exception {
-		boolean isValid = false;
-		String passwordMD5 = DigestUtils.md5Hex(password).toUpperCase();
-		File csvFile = new File("/resources/users.csv");
-		FileReader fr = new FileReader(csvFile);
-		BufferedReader br = new BufferedReader(fr);
-		String line;
+	private StringProperty user = new SimpleStringProperty();
+	private StringProperty pass = new SimpleStringProperty();
+	private BooleanProperty useLdap = new SimpleBooleanProperty();
 
-		while ((line = br.readLine()) != null && !isValid) {
-			String[] lines = line.split(",");
+	public final StringProperty userProperty() {
+		return this.user;
+	}
 
-			if (lines[0].equals(user) && lines[1].equals(passwordMD5)) {
-				isValid = true;
+	public final String getUser() {
+		return this.userProperty().get();
+	}
 
-			}
-		}
-		br.close();
-		return isValid;
+	public final void setUser(final String user) {
+		this.userProperty().set(user);
+	}
 
+	public final StringProperty passProperty() {
+		return this.pass;
+	}
+
+	public final String getPass() {
+		return this.passProperty().get();
+	}
+
+	public final void setPass(final String pass) {
+		this.passProperty().set(pass);
+	}
+
+	public final BooleanProperty useLdapProperty() {
+		return this.useLdap;
+	}
+
+	public final boolean isUseLdap() {
+		return this.useLdapProperty().get();
+	}
+
+	public final void setUseLdap(final boolean useLdap) {
+		this.useLdapProperty().set(useLdap);
 	}
 
 }

@@ -1,8 +1,9 @@
 package dad.login;
 
-import javafx.application.Platform;
+import dad.login.auth.AuthService;
+import dad.login.auth.FileAuthService;
+import dad.login.auth.LdapAuthService;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
@@ -12,45 +13,60 @@ public class Controller {
 	private Model model = new Model();
 
 	public Controller() {
-		view.getAccessButton().setOnAction(new EventHandler<ActionEvent>() {
 
-			public void handle(ActionEvent event) {
-				try {
-					boolean isValid = model.checkLogin(view.getUser(), view.getPassword());
-					if (isValid) {
-						mostrarAlert(AlertType.INFORMATION, "Acceso permitido",
-								"Las credenciales de acceso son válidas.");
-					} else {
-						mostrarAlert(AlertType.ERROR, "Acceso denegado",
-								"El usuario y/o contraseña no son válidos.");
-					}
-				} catch (Exception e) {
-					mostrarAlert(AlertType.ERROR, "Error", e.getMessage());
-				}
-			};
+		// bindings
 
-		});
+		model.userProperty().bind(view.getUser().textProperty());
+		model.passProperty().bindBidirectional(view.getPassword().textProperty());
+		model.useLdapProperty().bind(view.getCheckLdap().selectedProperty());
 
-		view.getCancelButton().setOnAction(new EventHandler<ActionEvent>() {
+		// listeners
 
-			@Override
-			public void handle(ActionEvent event) {
-				view.getCancelButton().setOnAction(e -> Platform.exit());
-			}
-		});
+		view.getAccessButton().setOnAction(this::onAccessAction);
+		view.getCancelButton().setOnAction(this::onCancelAction);
+
 	}
-	
-	public static void mostrarAlert(AlertType tipoAlerta, String cabecera, String contenido) {
-		Alert alert = new Alert(tipoAlerta);
-		alert.setTitle("Iniciar sesión");
-		alert.setHeaderText(cabecera);
-		alert.setContentText(contenido);
-		
-		alert.showAndWait();
+
+	private void onAccessAction(ActionEvent e) {
+		AuthService auth = model.isUseLdap() ? new LdapAuthService() : new FileAuthService();
+
+		try {
+			if (model.getPass() != null && model.getUser() != null && auth.login(model.getUser(), model.getPass())) {
+				Alert alert = new Alert(AlertType.INFORMATION);
+				alert.setTitle("Inicar sesión");
+				alert.setHeaderText("Acceso permitido");
+				alert.setContentText("Las credenciales de acceso son válidas");
+				alert.showAndWait();
+				App.primaryStage.close();
+			} else {
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("Inicar sersión");
+				alert.setHeaderText("Acceso denegado");
+				alert.setContentText("El usuario y/o la contraseña no son válidos");
+				alert.showAndWait();
+				model.setPass(null);
+			}
+		} catch (Exception e2) {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Error");
+			alert.setHeaderText("Error");
+			alert.setContentText(e2.getMessage());
+			alert.showAndWait();
+			e2.printStackTrace();
+		}
+
+	}
+
+	private void onCancelAction(ActionEvent e) {
+		App.primaryStage.close();
 	}
 
 	public View getView() {
 		return view;
+	}
+
+	public Model getModel() {
+		return model;
 	}
 
 }

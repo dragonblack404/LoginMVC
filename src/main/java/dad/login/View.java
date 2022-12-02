@@ -1,10 +1,7 @@
 package dad.login;
 
-import javafx.application.Application;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -15,16 +12,15 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.RowConstraints;
 
-public class View {
+public class View extends GridPane{
 
 	private Label userLabel = new Label("Usuario: ");
 	private Label passwdLabel = new Label("Contraseña: ");
 	private TextField userText = new TextField();
 	private PasswordField passwdText = new PasswordField();
-	private CheckBox checkBox = new CheckBox("Usar LDAP");
+	private CheckBox checkLdap = new CheckBox("Usar LDAP");
 	private Button accessButton = new Button("Acceder");
 	private Button cancelButton = new Button("Cancelar");
-	private GridPane root = new GridPane();
 	private HBox buttonsBox = new HBox();
 
 	public View() {
@@ -32,50 +28,53 @@ public class View {
 		userText.setPromptText("Usuario");
 		passwdText.setPromptText("Contraseña");
 
-		root.addRow(0, userLabel, userText);
-		root.addRow(1, passwdLabel, passwdText);
-		root.addRow(2, checkBox);
-		buttonsBox.getChildren().addAll(accessButton, cancelButton);
-		root.add(buttonsBox, 1, 2);
+		addRow(0, userLabel, userText);
+		addRow(1, passwdLabel, passwdText);
+		addRow(2,  new Label(), checkLdap);
+		add(buttonsBox, 0, 3,2,1);
+		buttonsBox.getChildren().addAll(new HBox(5,accessButton, cancelButton));
 
-		root.setPadding(new Insets(5));
-		root.setHgap(15);
-		root.setVgap(15);
-		root.setGridLinesVisible(false);
-		root.setAlignment(Pos.CENTER);
+		accessButton.setDefaultButton(true);
+		
+		setPadding(new Insets(5));
+		setHgap(15);
+		setVgap(15);
+		setGridLinesVisible(false);
+		setAlignment(Pos.CENTER);
 
 		buttonsBox.setSpacing(10);
 		buttonsBox.setAlignment(Pos.BASELINE_CENTER);
 
 		ColumnConstraints[] cols = { new ColumnConstraints(), new ColumnConstraints() };
 
-		root.getColumnConstraints().setAll(cols);
+		getColumnConstraints().setAll(cols);
 
 		RowConstraints[] rows = { new RowConstraints(), new RowConstraints(), new RowConstraints() };
 
-		root.getRowConstraints().setAll(rows);
+		getRowConstraints().setAll(rows);
 	}
 
-	public String getUser() {
-
-		return userText.getText();
+	public TextField getUser() {
+		return userText;
 	}
 
-	public String getPassword() {
+	public PasswordField getPassword() {
 
-		return passwdText.getText();
+		return passwdText;
 	}
 
 	public Button getAccessButton() {
 		return accessButton;
 	}
 
-	public GridPane getRoot() {
-		return root;
-	}
-
 	public Button getCancelButton() {
 		return cancelButton;
 	}
+	
+	public CheckBox getCheckLdap() {
+		return checkLdap;
+	}
+	
+
 
 }
